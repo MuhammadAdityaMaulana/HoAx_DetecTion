@@ -6,3 +6,4 @@ requests
 beautifulsoup4
 lxml
 gunicorn
+numpy==1.26.4
