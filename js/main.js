@@ -7,7 +7,7 @@
 /* ── KONFIGURASI ─────────────────────────────────────────────
    Ganti API_BASE sesuai URL Flask server Anda.
    ────────────────────────────────────────────────────────── */
-const API_BASE = 'http://localhost:5000';
+const API_BASE = 'https://hoaxradar-production.up.railway.app';
 
 /* ── CONTOH TEKS ─────────────────────────────────────────── */
 const EXAMPLES = {
