@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HoaxRadar — Deteksi Berita Hoax Sumedang</title>
+
+  <!-- Google Fonts: Syne + DM Sans + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+  <!-- Decorative layers -->
+  <div class="noise-overlay" aria-hidden="true"></div>
+  <div class="grid-bg"       aria-hidden="true"></div>
+
+  <!-- ══════════════════════════════════════
+       HEADER
+  ══════════════════════════════════════ -->
+  <header class="site-header">
+    <div class="header-inner">
+
+      <!-- Logo -->
+      <div class="logo">
+        <div class="logo-icon" aria-hidden="true">
+          <div class="logo-scan"></div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+            <path d="M11 8v6M8 11h6"/>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="logo-name">HoaxRadar</span>
+          <span class="logo-tag">Sumedang · FastText AI</span>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="status-badge" id="statusBadge">
+        <span class="status-dot" id="statusDot"></span>
+        <span class="status-label" id="statusLabel">Menghubungkan…</span>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════
+       HERO
+  ══════════════════════════════════════ -->
+  <section class="hero">
+    <div class="container">
+
+      <!-- Eyebrow badge -->
+      <p class="hero-chip">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+        Akurasi Model 94.29% · Precision 100%
+      </p>
+
+      <!-- Headline -->
+      <h1 class="hero-title">
+        Deteksi<br/>
+        <em>Berita Hoax</em><br/>
+        <span>Kabupaten Sumedang</span>
+      </h1>
+
+      <!-- Subline -->
+      <p class="hero-desc">
+        Sistem klasifikasi teks berbasis <strong>FastText</strong> dengan preprocessing
+        Bahasa Indonesia — stemming &amp; stopword removal via <strong>Sastrawi</strong>.
+        Analisis via <strong>teks langsung</strong> atau <strong>URL berita</strong>.
+      </p>
+
+      <!-- Stats strip -->
+      <div class="stats-row" role="list" aria-label="Performa model">
+        <div class="stat-card" role="listitem">
+          <span class="stat-val">94.29<sup>%</sup></span>
+          <span class="stat-lbl">Akurasi</span>
+        </div>
+        <div class="stat-card" role="listitem">
+          <span class="stat-val">100<sup>%</sup></span>
+          <span class="stat-lbl">Precision</span>
+        </div>
+        <div class="stat-card" role="listitem">
+          <span class="stat-val">84.62<sup>%</sup></span>
+          <span class="stat-lbl">Recall</span>
+        </div>
+        <div class="stat-card" role="listitem">
+          <span class="stat-val">91.67<sup>%</sup></span>
+          <span class="stat-lbl">F1-Score</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       MAIN
+  ══════════════════════════════════════ -->
+  <main class="main">
+    <div class="container">
+
+      <!-- Tab navigation -->
+      <div class="tab-nav" role="tablist" aria-label="Mode analisis">
+        <button class="tab tab--active" id="tabSingle"
+                role="tab" aria-selected="true" aria-controls="panelSingle"
+                onclick="switchTab('single')">
+          Analisis Tunggal
+        </button>
+        <button class="tab" id="tabBatch"
+                role="tab" aria-selected="false" aria-controls="panelBatch"
+                onclick="switchTab('batch')">
+          Analisis Batch
+        </button>
+      </div>
+
+      <!-- ════════════════════════════════
+           PANEL — TUNGGAL
+      ════════════════════════════════ -->
+      <div id="panelSingle" role="tabpanel" aria-labelledby="tabSingle">
+        <div class="panel-grid">
+
+          <!-- ── INPUT CARD ── -->
+          <div class="card input-card">
+
+            <!-- Mode switch: Teks / URL -->
+            <div class="mode-switch" role="group" aria-label="Pilih mode input">
+              <button class="mode-btn mode-btn--active" id="modeText" onclick="switchMode('text')"
+                      aria-pressed="true">
+                <!-- file-text icon -->
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14,2 14,8 20,8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+                Input Teks
+              </button>
+              <button class="mode-btn" id="modeUrl" onclick="switchMode('url')"
+                      aria-pressed="false">
+                <!-- link icon -->
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+                Input URL
+              </button>
+            </div>
+
+            <!-- ────────────────────────
+                 MODE: TEKS
+            ──────────────────────── -->
+            <div id="inputTextMode">
+
+              <label class="field-label" for="newsInput">Masukkan Teks Berita</label>
+
+              <textarea
+                id="newsInput"
+                rows="8"
+                maxlength="2000"
+                placeholder="Tempelkan judul atau narasi berita di sini…&#10;&#10;Contoh: Beredar akun WhatsApp mengatasnamakan Sekda Sumedang yang meminta donasi ke rekening pribadi…"
+                oninput="onInput()"
+                aria-describedby="charCount"
+              ></textarea>
+
+              <div class="input-footer">
+                <span class="char-count" id="charCount" aria-live="polite">0 / 2000</span>
+                <button class="btn-ghost" onclick="clearInput()" aria-label="Hapus teks">
+                  Hapus ✕
+                </button>
+              </div>
+
+              <!-- Contoh teks -->
+              <div class="example-row">
+                <span class="example-label">Contoh :</span>
+                <button class="chip chip--red"   onclick="loadExample('hoax')"
+                        aria-label="Muat contoh teks hoax">
+                  <!-- alert-triangle icon -->
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                  </svg>
+                  Hoax
+                </button>
+                <button class="chip chip--green" onclick="loadExample('legit')"
+                        aria-label="Muat contoh teks non-hoax">
+                  <!-- shield-check icon -->
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <polyline points="9,12 11,14 15,10"/>
+                  </svg>
+                  Non-Hoax
+                </button>
+              </div>
+
+              <!-- Analyze button -->
+              <button class="btn-primary" id="btnAnalyze" onclick="doPredict()">
+                <!-- search icon -->
+                <svg class="btn-icon" id="btnIcon" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2.5"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8"/>
+                  <path d="m21 21-4.35-4.35"/>
+                </svg>
+                <span id="btnText">Analisis Sekarang</span>
+              </button>
+              <p class="btn-hint">Ctrl + Enter untuk analisis cepat</p>
+
+            </div><!-- /inputTextMode -->
+
+            <!-- ────────────────────────
+                 MODE: URL
+            ──────────────────────── -->
+            <div id="inputUrlMode" class="hidden">
+
+              <label class="field-label" for="urlInput">Masukkan URL Berita</label>
+
+              <!-- URL input row -->
+              <div class="url-input-wrap">
+                <div class="url-icon" aria-hidden="true">
+                  <!-- globe icon -->
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="2" y1="12" x2="22" y2="12"/>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                  </svg>
+                </div>
+                <input
+                  type="url"
+                  id="urlInput"
+                  placeholder="https://www.contohberita.com/berita/..."
+                  oninput="onUrlInput()"
+                  onkeydown="if((event.ctrlKey||event.metaKey)&&event.key==='Enter') doUrlPredict()"
+                  aria-label="URL berita yang akan dianalisis"
+                />
+                <button class="url-clear" id="urlClearBtn" onclick="clearUrl()" aria-label="Hapus URL">
+                  <!-- x icon -->
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Source chips -->
+              <div class="url-examples">
+                <p class="example-label">Sumber berita yang didukung :</p>
+                <div class="url-source-chips">
+                  <span class="source-chip">detik.com</span>
+                  <span class="source-chip">kompas.com</span>
+                  <span class="source-chip">tribunnews.com</span>
+                  <span class="source-chip">pikiran-rakyat.com</span>
+                  <span class="source-chip">sumedangekspres.com</span>
+                  <span class="source-chip">radarsumedang.com</span>
+                </div>
+              </div>
+
+              <!-- Info notice -->
+              <div class="info-box" role="note">
+                <!-- info icon -->
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <p>Sistem mengambil konten artikel secara otomatis dari URL yang Anda masukkan, lalu langsung menganalisisnya dengan model FastText.</p>
+              </div>
+
+              <!-- URL analyze button -->
+              <button class="btn-primary btn-url" id="btnUrlAnalyze" onclick="doUrlPredict()">
+                <!-- link icon -->
+                <svg class="btn-icon" id="btnUrlIcon" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2.5"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+                <span id="btnUrlText">Analisis URL</span>
+              </button>
+              <p class="btn-hint">Ctrl + Enter untuk analisis cepat</p>
+
+            </div><!-- /inputUrlMode -->
+
+          </div><!-- /input-card -->
+
+          <!-- ── RESULT CARD ── -->
+          <div class="result-wrap" id="resultWrap">
+
+            <!-- Placeholder -->
+            <div class="card result-placeholder" id="resultPlaceholder" aria-hidden="true">
+              <div class="placeholder-ring">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="1.5"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"/>
+                  <path d="m21 21-4.35-4.35"/>
+                  <path d="M11 8v6M8 11h6"/>
+                </svg>
+              </div>
+              <p>Hasil analisis muncul di sini</p>
+            </div>
+
+            <!-- Hasil diisi oleh JS -->
+            <div id="resultCard" class="hidden"
+                 role="region" aria-live="polite" aria-label="Hasil analisis"></div>
+
+          </div><!-- /result-wrap -->
+
+        </div><!-- /panel-grid -->
+
+        <!-- ── HISTORY ── -->
+        <section class="history hidden" id="historySection"
+                 aria-label="Riwayat analisis">
+          <div class="history-header">
+            <h2 class="history-title">Riwayat Analisis</h2>
+            <button class="btn-ghost" onclick="clearHistory()">Hapus Semua</button>
+          </div>
+          <div id="historyList" role="list"></div>
+        </section>
+
+      </div><!-- /panelSingle -->
+
+      <!-- ════════════════════════════════
+           PANEL — BATCH
+      ════════════════════════════════ -->
+      <div id="panelBatch" class="hidden"
+           role="tabpanel" aria-labelledby="tabBatch">
+
+        <div class="card input-card">
+          <label class="field-label" for="batchInput">
+            Analisis Batch — Satu Berita Per Baris (Maks. 50)
+          </label>
+
+          <textarea
+            id="batchInput"
+            rows="12"
+            placeholder="Berita 1: Beredar video penculikan anak di Sumedang...&#10;Berita 2: Pemerintah Sumedang resmikan jembatan baru...&#10;Berita 3: ..."
+            oninput="onBatchInput()"
+          ></textarea>
+
+          <div class="batch-footer">
+            <button class="btn-primary btn-primary--auto" id="btnBatch" onclick="doBatch()">
+              <!-- list icon -->
+              <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2.5"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="8" y1="6"  x2="21" y2="6"/>
+                <line x1="8" y1="12" x2="21" y2="12"/>
+                <line x1="8" y1="18" x2="21" y2="18"/>
+                <line x1="3" y1="6"  x2="3.01" y2="6"/>
+                <line x1="3" y1="12" x2="3.01" y2="12"/>
+                <line x1="3" y1="18" x2="3.01" y2="18"/>
+              </svg>
+              <span id="btnBatchText">Analisis Batch</span>
+            </button>
+            <span class="batch-count" id="batchCount" aria-live="polite"></span>
+          </div>
+        </div>
+
+        <!-- Hasil batch diisi oleh JS -->
+        <div id="batchOutput"
+             role="region" aria-live="polite" aria-label="Hasil analisis batch"></div>
+
+      </div><!-- /panelBatch -->
+
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════ -->
+  <footer class="site-footer">
+    <p>HoaxRadar · Dinas Kominfo Kabupaten Sumedang · FastText Algorithm</p>
+    <p>Dataset 87 Berita (2022–2025) · Accuracy 94.29% · Precision 100% · F1-Score 91.67%</p>
+  </footer>
+
+  <!-- JavaScript — di bawah agar DOM sudah siap -->
+  <script src="js/main.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,8 @@
+flask
+flask-cors
+fasttext-wheel
+PySastrawi
+requests
+beautifulsoup4
+lxml
+gunicorn

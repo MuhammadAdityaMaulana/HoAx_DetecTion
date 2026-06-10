@@ -1,0 +1,48 @@
+
+============================================================
+  HoaxRadar — Laporan Evaluasi Model FastText
+  Dataset: Berita Hoax Kabupaten Sumedang 2022-2025
+============================================================
+
+KONFIGURASI TRAINING
+  Dataset        : berita smd 2022-2025.csv
+  Total Data     : 87 berita
+  Data Training  : 69 berita (80%)
+  Data Testing   : 18 berita (20%)
+  Epoch          : 100
+  Learning Rate  : 0.5
+  Word N-gram    : 1
+  Dimensi Vektor : 50
+  Loss Function  : softmax
+  Sastrawi       : Ya
+
+DISTRIBUSI LABEL
+  NON-HOAX (0)   : 55 data
+  HOAX (1)       : 32 data
+
+HASIL EVALUASI
+  Accuracy       : 94.44%
+  Precision      : 100.00%
+  Recall         : 85.71%
+  F1-Score       : 92.31%
+
+CONFUSION MATRIX
+                       Pred NON-HOAX  Pred HOAX
+  Actual NON-HOAX              11             0
+  Actual HOAX                   1             6
+
+CLASSIFICATION REPORT
+              precision    recall  f1-score   support
+
+    NON-HOAX       0.92      1.00      0.96        11
+        HOAX       1.00      0.86      0.92         7
+
+    accuracy                           0.94        18
+   macro avg       0.96      0.93      0.94        18
+weighted avg       0.95      0.94      0.94        18
+
+
+OUTPUT FILE
+  Model    : model_fasttext_hoax_sumedang.bin
+  Evaluasi : hasil_evaluasi.txt
+============================================================
