@@ -131,15 +131,27 @@ a:hover { text-decoration:underline; }
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* Fine grid — double density creates depth */
+/* Ambient glow — soft radial light pools, no harsh grid lines */
 .grid-bg {
   position:fixed; inset:0; pointer-events:none; z-index:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 12% 8%,  rgba(200,149,46,0.07)  0%, transparent 60%),
+    radial-gradient(ellipse 60% 45% at 88% 18%, rgba(136,120,192,0.06) 0%, transparent 58%),
+    radial-gradient(ellipse 55% 50% at 80% 88%, rgba(61,120,192,0.05)  0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 8% 85%,  rgba(62,152,96,0.045)  0%, transparent 55%),
+    radial-gradient(ellipse 90% 70% at 50% 45%, rgba(16,16,22,0)       0%, rgba(6,6,10,0.4) 100%);
+}
+
+/* Faint vertical hairlines — editorial rhythm instead of a grid */
+.grid-bg::before {
+  content:'';
+  position:absolute; inset:0;
   background-image:
-    linear-gradient(var(--b1) 1px, transparent 1px),
-    linear-gradient(90deg, var(--b1) 1px, transparent 1px),
-    linear-gradient(var(--p02) 1px, transparent 1px),
     linear-gradient(90deg, var(--p02) 1px, transparent 1px);
-  background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+  background-size: 120px 100%;
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 35%, black 0%, transparent 75%);
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 35%, black 0%, transparent 75%);
+  opacity:.5;
 }
 
 
@@ -193,6 +205,20 @@ a:hover { text-decoration:underline; }
 
 /* ─ Logo ─ */
 .logo { display:flex; align-items:center; gap:13px; }
+
+/* Institutional logo (FTI UNSAP) */
+.logo-fti {
+  height:34px; width:34px;
+  object-fit:contain;
+  flex-shrink:0;
+}
+
+/* Thin vertical divider between institution & product logo */
+.logo-divider {
+  width:1px; height:26px;
+  background:var(--b3);
+  flex-shrink:0;
+}
 
 .logo-icon {
   position:relative; width:40px; height:40px;
@@ -274,7 +300,15 @@ a:hover { text-decoration:underline; }
 /* ══════════════════════════════════════════════════════════
    9. HERO
 ══════════════════════════════════════════════════════════ */
-.hero { padding:84px 0 60px; text-align:center; }
+.hero { padding:84px 0 60px; text-align:center; position:relative; }
+
+/* Soft glow anchor behind headline — adds depth without a hard edge */
+.hero::before {
+  content:'';
+  position:absolute; top:-40px; left:50%; transform:translateX(-50%);
+  width:680px; height:420px; pointer-events:none; z-index:-1;
+  background:radial-gradient(ellipse 50% 50% at 50% 30%, rgba(200,149,46,0.06) 0%, transparent 70%);
+}
 
 /* Eyebrow pill */
 .hero-chip {
@@ -1046,6 +1080,26 @@ details summary:hover { color:var(--p50); }
   font-family:var(--ff-mono); font-size:10px;
   color:var(--p16); letter-spacing:.08em;
   text-transform:uppercase; line-height:1.9;
+}
+
+/* Footer brand row — institutional logo + text */
+.footer-brand {
+  display:flex; align-items:center; justify-content:center;
+  gap:14px; flex-wrap:wrap;
+}
+
+.footer-logo {
+  height:30px; width:30px;
+  object-fit:contain;
+  opacity:.65;
+  flex-shrink:0;
+}
+
+.footer-brand-text { text-align:left; }
+
+@media (max-width:480px) {
+  .footer-brand { flex-direction:column; text-align:center; }
+  .footer-brand-text { text-align:center; }
 }
 
 
